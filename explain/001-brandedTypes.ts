@@ -5,6 +5,9 @@
 // 4. Type safety and compile-time checks
 // 5. Factory functions
 
+import { ifError } from "assert";
+import constants from "constants"
+
 /* Martin: check previos knowledge here  */
 
 /*  RESTAURANT DOMAIN   */
@@ -12,9 +15,40 @@ const calculatePrice = (price: number, quantity: number): number => {
 	return price * quantity
 }
 // CAREFUL ! This function is very flexible but also very error-prone. It accepts any numbers !
+/*
+/*
+
+/*
+/*
+//   MY FACTORY FUNCTION.
+/*
+/*
+/*
+/*/
+// TODO:  1. create makePrice and makeQuantity functions that validate the inputs and return branded types instead of raw numbers.
+
+type Brand<K, T>  = K & { __brand: T }
+
+
+
+const makePrice =(price: number): number =>{
+	if (price < 0) {
+		throw new Error("Price cannot be negative 😔😔");
+		
+	}
+	return price;
+}
+
+const makeQuantity =(quantity: number): number =>{
+	if (quantity <= 0) {
+		throw new Error("Quantity should be positive 😔");
+		
+	}
+	return quantity;
+}
 
 /*  manual tests   */
-const total = calculatePrice(10, 3) // user inputs price and quantity
+const total = calculatePrice(makePrice(10), makeQuantity(3)) // user inputs price and quantity
 
 console.log(`Total cost: $${total}`)
 /*
@@ -30,6 +64,7 @@ console.log(`Total cost: $${total}`)
 /*
 /*
 /**********************/
+
 
 // TODO:  1. create makePrice and makeQuantity functions that validate the inputs and return branded types instead of raw numbers.
 

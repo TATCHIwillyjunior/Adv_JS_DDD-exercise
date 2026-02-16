@@ -26,13 +26,13 @@ import { logError } from "./logger.js"
 export function exercise2_PrimitiveQuantity() {
 	type Order = {
 		itemName: string
-		quantity: number // Could be 0, negative, or absurdly high!
+		quantity: Quantity // Could be 0, negative, or absurdly high!
 		pricePerUnit: number
 	}
 
 	const order: Order = {
 		itemName: "Pizza",
-		quantity: -3, // Silent bug! Negative quantity
+		quantity: createQuantity(3), // Silent bug! Negative quantity
 		pricePerUnit: 15,
 	}
 
@@ -40,6 +40,21 @@ export function exercise2_PrimitiveQuantity() {
 	// Both of the bugs below should become impossible:
 	//   quantity: -3       // <-- negative
 	//   quantity: 50000    // <-- exceeds business limit
+
+
+	// What I'm doing (My work)
+	//
+	//
+	type Quantity = number & { readonly __brand: unique symbol }
+	function createQuantity(n: number): Quantity {
+      	if (!Number.isInteger(n)) throw new Error("Quantity must be a whole number")
+      	if (n <= 0) 
+			throw new Error("Quantity must be positive 😔")
+      	if (n > 100)
+			 throw new Error("Quantity exceeds maximum per order 😔😔")
+      	return n as Quantity
+  	}
+
 
 	const total = order.quantity * order.pricePerUnit
 	logError(2, "Negative quantity allowed - restaurant owes customer money?", {
@@ -51,7 +66,7 @@ export function exercise2_PrimitiveQuantity() {
 	// Another silent bug - absurd quantity
 	const bulkOrder: Order = {
 		itemName: "Coffee",
-		quantity: 50000, // Silent bug! Unrealistic quantity
+		quantity: createQuantity(50000), // Silent bug! Unrealistic quantity
 		pricePerUnit: 3,
 	}
 
