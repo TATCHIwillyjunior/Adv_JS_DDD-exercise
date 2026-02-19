@@ -36,7 +36,7 @@ import { logError } from "./logger.js"
 export function exercise8_EmailValidation() {
 	type Customer = {
 		name: string
-		email: string
+		email: Email
 	}
 
 	// TODO: Replace `string` with a branded Email type backed by parseEmail().
@@ -44,15 +44,42 @@ export function exercise8_EmailValidation() {
 	// throw at runtime, and the type system prevents passing raw strings
 	// where an Email is expected.
 
+
+	// What I'm doing (My work)
+
+	  type Email = string & { readonly __brand: unique symbol }
+
+  function parseEmail(raw: string): Email {
+      const trimmed = raw.trim()
+      if (trimmed.length === 0) throw new Error("Email cannot be empty")
+      // Basic structural check: local@domain.tld
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed))
+          throw new Error(`Invalid email format: "${raw}"`)
+      return trimmed.toLowerCase() as Email
+  }
+
 	// All these pass TypeScript checking
+
 	const customers: Customer[] = [
-		{ name: "Alice", email: "alice@example.com" }, // Valid
-		{ name: "Bob", email: "not-an-email" }, // Silent bug!
-		{ name: "Charlie", email: "charlie@@double.com" }, // Silent bug!
-		{ name: "Diana", email: "@no-local-part.com" }, // Silent bug!
-		{ name: "Eve", email: "eve@" }, // Silent bug!
-		{ name: "Frank", email: " " }, // Silent bug! Just whitespace
+		{ name: "Alice", email: parseEmail("alice@example.com") }, // Valid
+		{ name: "Bob", email: parseEmail("not-an-email") }, // Silent bug!
+		{ name: "Charlie", email: parseEmail("charlie@@double.com") }, // Silent bug!
+		{ name: "Diana", email: parseEmail("@no-local-part.com") }, // Silent bug!
+		{ name: "Eve", email: parseEmail("eve@") }, // Silent bug!
+		{ name: "Frank", email: parseEmail(" ") }, // Silent bug! Just whitespace
 	]
+
+	// Valid emails are accepted, but invalid formats throw at runtime
+
+	// const customers: Customer[] = [
+  	// 	{ name: "Alice",   email: parseEmail("alice@example.com") },
+  	// 	{ name: "Bob",     email: parseEmail("bob.smith@company.org") },
+  	// 	{ name: "Charlie", email: parseEmail("charlie_01@doublemail.com") },
+  	// 	{ name: "Diana",   email: parseEmail("diana@local-part.net") },
+  	// 	{ name: "Eve",     email: parseEmail("eve@domain.io") },
+  	// 	{ name: "Frank",   email: parseEmail("frank.junior@sample.co") }
+	// ]
+
 
 	logError(8, "Invalid emails accepted - no domain validation", {
 		customers,
